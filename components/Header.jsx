@@ -20,7 +20,7 @@ export default function Header() {
           <Link href="/dashboard" className="btn-secondary" style={{ textDecoration: 'none', whiteSpace: 'nowrap' }}>
             📊 Dashboard
           </Link>
-          <Link href="/" className="btn-secondary" style={{ textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          <Link href="/project?new=true" className="btn-secondary" style={{ textDecoration: 'none', whiteSpace: 'nowrap' }}>
             ➕ New Project
           </Link>
         </div>

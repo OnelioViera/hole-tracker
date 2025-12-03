@@ -42,7 +42,7 @@ export default function Dashboard() {
   };
 
   const handleOpenProject = (projectId) => {
-    router.push(`/?project=${projectId}`);
+    router.push(`/project?project=${projectId}`);
   };
 
   const handleDeleteProject = async () => {
@@ -95,7 +95,7 @@ export default function Dashboard() {
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h1 style={{ margin: 0 }}>Projects Dashboard</h1>
-          <Link href="/" className="btn-small btn-primary" style={{ textDecoration: 'none', display: 'inline-block' }}>
+          <Link href="/project?new=true" className="btn-small btn-primary" style={{ textDecoration: 'none', display: 'inline-block' }}>
             ✏️ New Project
           </Link>
         </div>
