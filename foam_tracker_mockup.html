@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foam Sheet Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-logo {
+            height: 80px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 4px;
+            color: #1a1a1a;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d0d0d0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-row-three {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .holes-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .hole-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .hole-item-left {
+            flex: 1;
+        }
+
+        .hole-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .hole-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .hole-item-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .quantity-control {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            background: white;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+        }
+
+        .quantity-control button {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .quantity-control button:hover {
+            background: #f0f0f0;
+        }
+
+        .quantity-value {
+            min-width: 30px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-unit {
+            font-size: 14px;
+            color: #999;
+            margin-left: 4px;
+        }
+
+        .highlight {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #e0e0e0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-round {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-skewed {
+            background-color: #fed7aa;
+            color: #9a3412;
+        }
+
+        .divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 20px 0;
+        }
+
+        .calculation-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .calculation-row.total {
+            border-bottom: 2px solid #2563eb;
+            border-top: 2px solid #2563eb;
+            padding: 12px;
+            background: #f0f7ff;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .calculation-row.total .label {
+            color: #1d4ed8;
+        }
+
+        .calculation-row.total .value {
+            color: #1d4ed8;
+        }
+
+        .label {
+            color: #666;
+        }
+
+        .value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .footer-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-large {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .card-spacing {
+            margin-top: 16px;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid;
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast.info {
+            border-left-color: #3b82f6;
+        }
+
+        .toast.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon {
+            color: #10b981;
+        }
+
+        .toast.error .toast-icon {
+            color: #ef4444;
+        }
+
+        .toast.info .toast-icon {
+            color: #3b82f6;
+        }
+
+        .toast.warning .toast-icon {
+            color: #f59e0b;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+            color: #1a1a1a;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            color: #666;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.removing {
+            animation: slideOut 0.3s ease-out;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <img src="9011e5_cf796f4367f54052a843ba0ed695b544~mv2 (2).png" alt="Lindsay Precast" class="header-logo">
+                <div>
+                    <h1>Foam Sheet Tracker</h1>
+                    <p class="subtitle">Estimate foam sheets needed for holes</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left Column: Input Form -->
+            <div class="card">
+                <h2>Project Information</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Customer Name</label>
+                        <input type="text" id="customer-name" placeholder="Enter customer name">
+                    </div>
+                    <div class="form-group">
+                        <label>Job Number</label>
+                        <input type="text" id="job-number" placeholder="Enter job number">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Job Name</label>
+                    <input type="text" id="job-name" placeholder="Enter job name">
+                </div>
+
+                <div class="divider"></div>
+
+                <h2>Add Holes</h2>
+
+                <div class="form-group">
+                    <label>Hole Type</label>
+                    <select id="hole-type-select">
+                        <option value="round">Round Hole</option>
+                        <option value="skewed">Skewed Hole</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="round-diameter-group">
+                    <label>Hole Diameter (inches)</label>
+                    <input type="number" id="hole-diameter" placeholder="Enter diameter (e.g., 4, 6, 8)" min="1">
+                </div>
+
+                <div class="form-row" id="skewed-dimensions-group" style="display: none;">
+                    <div class="form-group">
+                        <label>Width (inches)</label>
+                        <input type="number" id="hole-width" placeholder="Width" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Height (inches)</label>
+                        <input type="number" id="hole-height" placeholder="Height" min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Foam Thickness</label>
+                    <select>
+                        <option value="4">4 inches</option>
+                        <option value="5">5 inches</option>
+                        <option value="6" selected>6 inches</option>
+                        <option value="7">7 inches</option>
+                        <option value="8">8 inches</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-primary">Add Hole(s)</button>
+                    <button type="button" class="btn-secondary">Clear Form</button>
+                </div>
+
+                <div class="divider"></div>
+
+                <h2>Added Holes</h2>
+                <div class="holes-list">
+                    <div class="empty-state">No holes added yet. Use the form above to add holes.</div>
+                </div>
+            </div>
+
+            <!-- Right Column: Summary & Calculations -->
+            <div>
+                <div class="card">
+                    <h2>Foam Calculations</h2>
+
+                    <div class="calculation-row" id="calc-sheet-size">
+                        <span class="label">Sheet Size:</span>
+                        <span class="value">4' × 8' (32 sq ft)</span>
+                    </div>
+
+                    <div class="calculation-row" id="calc-hole-area">
+                        <span class="label">Total Hole Area:</span>
+                        <span class="value">0.00 sq ft</span>
+                    </div>
+
+                    <div class="calculation-row" id="calc-waste">
+                        <span class="label">Waste Factor (10%):</span>
+                        <span class="value">0.00 sq ft</span>
+                    </div>
+
+                    <div class="calculation-row total" id="calc-total">
+                        <span class="label">Total Area Needed:</span>
+                        <span class="value">0.00 sq ft</span>
+                    </div>
+
+                    <div class="calculation-row highlight" id="calc-sheets">
+                        <span class="label"><strong>Sheets Required:</strong></span>
+                        <span class="value"><strong>0</strong></span>
+                    </div>
+                </div>
+
+                <div class="card card-spacing">
+                    <h2>Breakdown by Thickness</h2>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Thickness</th>
+                                    <th scope="col" class="text-right">Area (sq ft)</th>
+                                    <th scope="col" class="text-right">Sheets</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="3" class="empty-state">No data</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card card-spacing">
+                    <h2>Hole Summary</h2>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col" class="text-right">Qty</th>
+                                    <th scope="col" class="text-right">Area</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" class="empty-state">No holes added</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom: Actions -->
+        <div class="card">
+            <h2>Export &amp; Actions</h2>
+            <div class="footer-actions">
+                <button type="button" class="btn-primary btn-large">📥 Download PDF</button>
+                <button type="button" class="btn-secondary btn-large">🔄 Reset All</button>
+                <button type="button" class="btn-secondary btn-large">💾 Save Project</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        const state = {
+            customerName: '',
+            jobNumber: '',
+            jobName: '',
+            holes: [],
+            nextId: 1,
+            sheetSize: { width: 4, height: 8 }, // in feet
+            wasteFactor: 0.10 // 10%
+        };
+
+        // Hole Class
+        class Hole {
+            constructor(type, diameter, thickness, quantity, width, height) {
+                this.id = state.nextId++;
+                this.type = type;
+                this.diameter = diameter; // For round holes
+                this.width = width; // For skewed holes
+                this.height = height; // For skewed holes
+                this.thickness = thickness;
+                this.quantity = quantity;
+            }
+
+            getArea() {
+                let area;
+                
+                if (this.type === 'round') {
+                    // Area of circle in square inches
+                    const radius = this.diameter / 2;
+                    area = Math.PI * radius * radius;
+                } else if (this.type === 'skewed') {
+                    // Area of rectangle in square inches
+                    area = this.width * this.height;
+                    // Skewed holes need 1.5x more foam
+                    area *= 1.5;
+                }
+                
+                return area * this.quantity;
+            }
+
+            getAreaInSqFt() {
+                return this.getArea() / 144; // Convert sq inches to sq feet
+            }
+
+            getDisplaySize() {
+                if (this.type === 'round') {
+                    return this.diameter + '" Ø';
+                } else {
+                    return this.width + '" × ' + this.height + '"';
+                }
+            }
+        }
+
+        // DOM Elements - will be initialized after DOM loads
+        let elements;
+
+        // Toast Notification System
+        function showToast(message, type = 'info', title = '') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            const titles = {
+                success: title || 'Success',
+                error: title || 'Error',
+                warning: title || 'Warning',
+                info: title || 'Info'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // Add hole function
+        function addHole() {
+            const type = elements.holeType.value;
+            const thickness = parseFloat(elements.foamThickness.value);
+            const quantity = 1; // Always add 1 hole at a time
+            let diameter, width, height;
+
+            // Validation based on hole type
+            if (type === 'round') {
+                diameter = parseFloat(elements.holeDiameter.value);
+                if (!diameter || diameter <= 0) {
+                    showToast('Please enter a valid hole diameter', 'error');
+                    return;
+                }
+            } else if (type === 'skewed') {
+                width = parseFloat(elements.holeWidth.value);
+                height = parseFloat(elements.holeHeight.value);
+                if (!width || width <= 0 || !height || height <= 0) {
+                    showToast('Please enter valid width and height', 'error');
+                    return;
+                }
+            }
+
+            const hole = new Hole(type, diameter, thickness, quantity, width, height);
+            state.holes.push(hole);
+            
+            render();
+            clearForm();
+            showToast('Hole added successfully', 'success');
+        }
+
+        // Clear form function
+        function clearForm() {
+            elements.holeDiameter.value = '';
+            elements.holeWidth.value = '';
+            elements.holeHeight.value = '';
+            elements.holeType.selectedIndex = 0;
+            elements.foamThickness.value = '6';
+            // Reset to show diameter field
+            elements.roundDiameterGroup.style.display = 'block';
+            elements.skewedDimensionsGroup.style.display = 'none';
+        }
+
+        // Reset all function
+        function resetAll() {
+            if (state.holes.length === 0 && !state.customerName && !state.jobNumber && !state.jobName) return;
+            
+            if (confirm('Are you sure you want to reset all data including customer information?')) {
+                state.customerName = '';
+                state.jobNumber = '';
+                state.jobName = '';
+                state.holes = [];
+                state.nextId = 1;
+                if (elements.customerName) elements.customerName.value = '';
+                if (elements.jobNumber) elements.jobNumber.value = '';
+                if (elements.jobName) elements.jobName.value = '';
+                render();
+            }
+        }
+
+        // Update quantity function
+        function updateQuantity(id, change) {
+            const hole = state.holes.find(h => h.id === id);
+            if (hole) {
+                hole.quantity += change;
+                if (hole.quantity < 1) hole.quantity = 1;
+                render();
+            }
+        }
+
+        // Remove hole function
+        function removeHole(id) {
+            state.holes = state.holes.filter(h => h.id !== id);
+            render();
+        }
+
+        // Calculate totals
+        function calculateTotals() {
+            const sheetAreaSqFt = state.sheetSize.width * state.sheetSize.height;
+            
+            let totalHoleArea = 0;
+            state.holes.forEach(hole => {
+                totalHoleArea += hole.getAreaInSqFt();
+            });
+
+            const wasteArea = totalHoleArea * state.wasteFactor;
+            const totalAreaNeeded = totalHoleArea + wasteArea;
+            const sheetsRequired = Math.ceil(totalAreaNeeded / sheetAreaSqFt);
+
+            return {
+                sheetAreaSqFt,
+                totalHoleArea,
+                wasteArea,
+                totalAreaNeeded,
+                sheetsRequired
+            };
+        }
+
+        // Get breakdown by thickness
+        function getBreakdownByThickness() {
+            const breakdown = {};
+            
+            state.holes.forEach(hole => {
+                if (!breakdown[hole.thickness]) {
+                    breakdown[hole.thickness] = 0;
+                }
+                breakdown[hole.thickness] += hole.getAreaInSqFt();
+            });
+
+            // Add waste factor to each thickness
+            const result = {};
+            Object.keys(breakdown).forEach(thickness => {
+                const area = breakdown[thickness];
+                const withWaste = area * (1 + state.wasteFactor);
+                const sheetAreaSqFt = state.sheetSize.width * state.sheetSize.height;
+                const sheets = Math.ceil(withWaste / sheetAreaSqFt);
+                result[thickness] = { area: withWaste, sheets };
+            });
+
+            return result;
+        }
+
+        // Render holes list
+        function renderHolesList() {
+            if (state.holes.length === 0) {
+                elements.holesList.innerHTML = '<div class="empty-state">No holes added yet. Use the form above to add holes.</div>';
+                return;
+            }
+
+            elements.holesList.innerHTML = state.holes.map(hole => `
+                <div class="hole-item">
+                    <div class="hole-item-left">
+                        <div class="hole-name">
+                            <span class="badge badge-${hole.type}">${hole.type.toUpperCase()}</span> ${hole.getDisplaySize()}
+                        </div>
+                        <div class="hole-details">${hole.thickness}" Foam Thickness</div>
+                    </div>
+                    <div class="hole-item-right">
+                        <div class="quantity-control">
+                            <button onclick="updateQuantity(${hole.id}, -1)">−</button>
+                            <div class="quantity-value">${hole.quantity}</div>
+                            <button onclick="updateQuantity(${hole.id}, 1)">+</button>
+                        </div>
+                        <button class="btn-small btn-danger" onclick="removeHole(${hole.id})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render calculations
+        function renderCalculations() {
+            const totals = calculateTotals();
+            
+            document.querySelector('#calc-sheet-size .value').textContent = `${state.sheetSize.width}' × ${state.sheetSize.height}' (${totals.sheetAreaSqFt} sq ft)`;
+            document.querySelector('#calc-hole-area .value').textContent = `${totals.totalHoleArea.toFixed(2)} sq ft`;
+            document.querySelector('#calc-waste .value').textContent = `${totals.wasteArea.toFixed(2)} sq ft`;
+            document.querySelector('#calc-total .value').textContent = `${totals.totalAreaNeeded.toFixed(2)} sq ft`;
+            document.querySelector('#calc-sheets .value strong').textContent = totals.sheetsRequired;
+        }
+
+        // Render breakdown by thickness
+        function renderBreakdownByThickness() {
+            const breakdown = getBreakdownByThickness();
+            const tbody = document.querySelectorAll('tbody')[0];
+            
+            if (Object.keys(breakdown).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No data</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = Object.keys(breakdown).sort((a, b) => a - b).map(thickness => `
+                <tr>
+                    <td>${thickness}"</td>
+                    <td class="text-right">${breakdown[thickness].area.toFixed(2)}</td>
+                    <td class="text-right">${breakdown[thickness].sheets}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render hole summary table
+        function renderHoleSummary() {
+            const tbody = document.querySelectorAll('tbody')[1];
+            
+            if (state.holes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No holes added</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = state.holes.map(hole => `
+                <tr>
+                    <td><span class="badge badge-${hole.type}">${hole.type.toUpperCase()}</span></td>
+                    <td>${hole.getDisplaySize()}</td>
+                    <td class="text-right">${hole.quantity}</td>
+                    <td class="text-right">${hole.getArea().toFixed(2)} sq in</td>
+                </tr>
+            `).join('');
+        }
+
+        // Main render function
+        function render() {
+            renderHolesList();
+            renderCalculations();
+            renderBreakdownByThickness();
+            renderHoleSummary();
+        }
+
+        // Download PDF function
+        document.querySelector('.footer-actions .btn-primary').addEventListener('click', function() {
+            if (state.holes.length === 0) {
+                showToast('Please add holes before generating a PDF', 'warning');
+                return;
+            }
+
+            showToast('Opening PDF preview...', 'info');
+
+            const totals = calculateTotals();
+            const breakdown = getBreakdownByThickness();
+            
+            // Build breakdown table rows
+            const breakdownRows = Object.keys(breakdown).sort((a, b) => a - b).map(thickness => 
+                '<tr><td>' + thickness + '"</td><td class="text-right">' + 
+                breakdown[thickness].area.toFixed(2) + '</td><td class="text-right">' + 
+                breakdown[thickness].sheets + '</td></tr>'
+            ).join('');
+
+            // Build hole details rows
+            const holeRows = state.holes.map(hole => 
+                '<tr><td><span class="badge badge-' + hole.type + '">' + hole.type.toUpperCase() + 
+                '</span></td><td>' + hole.getDisplaySize() + '</td><td>' + hole.thickness + 
+                '"</td><td class="text-right">' + hole.quantity + '</td><td class="text-right">' + 
+                (hole.getArea() / hole.quantity).toFixed(2) + ' sq in</td><td class="text-right">' + 
+                hole.getArea().toFixed(2) + ' sq in</td></tr>'
+            ).join('');
+            
+            // Create printable content
+            let printWindow = window.open('', '_blank');
+            const customerInfo = (state.customerName || state.jobNumber || state.jobName) ? 
+                '<div class="customer-info">' +
+                (state.customerName ? '<p><strong>Customer:</strong> ' + state.customerName + '</p>' : '') +
+                (state.jobNumber ? '<p><strong>Job Number:</strong> ' + state.jobNumber + '</p>' : '') +
+                (state.jobName ? '<p><strong>Job Name:</strong> ' + state.jobName + '</p>' : '') +
+                '</div>' : '';
+
+            // Convert logo to base64 for embedding in PDF
+            const logoPath = '9011e5_cf796f4367f54052a843ba0ed695b544~mv2 (2).png';
+            
+            const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Foam Sheet Tracker Report</title><style>' +
+                'body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; font-size: 12px; }' +
+                'p { font-size: 12px; margin: 8px 0; }' +
+                '.pdf-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; border-bottom: 3px solid #2563eb; padding-bottom: 10px; }' +
+                '.pdf-header img { height: 60px; }' +
+                '.pdf-header-text h1 { color: #1a1a1a; font-size: 20px; margin: 0 0 4px 0; }' +
+                '.pdf-header-text p { font-size: 11px; margin: 0; color: #666; }' +
+                'h2 { color: #1a1a1a; margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #e0e0e0; padding-bottom: 6px; font-size: 15px; }' +
+                '.customer-info { margin: 15px 0; padding: 12px; background: #f9f9f9; border-radius: 6px; font-size: 12px; }' +
+                '.customer-info p { margin: 4px 0; }' +
+                '.summary-box { background: #f0f7ff; border: 2px solid #2563eb; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 11px; }' +
+                '.summary-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #d0d0d0; font-size: 11px; }' +
+                '.summary-row:last-child { border-bottom: none; }' +
+                '.summary-row.highlight { background: #fef3c7; padding: 8px; margin-top: 6px; font-weight: bold; font-size: 14px; }' +
+                'table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 11px; }' +
+                'th { background-color: #f9f9f9; padding: 6px 8px; text-align: left; border-bottom: 2px solid #2563eb; font-weight: 600; font-size: 11px; }' +
+                'td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; font-size: 11px; }' +
+                '.text-right { text-align: right; }' +
+                '.badge { display: inline-block; padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: 500; }' +
+                '.badge-round { background-color: #dbeafe; color: #1e40af; }' +
+                '.badge-skewed { background-color: #fed7aa; color: #9a3412; }' +
+                '.footer { margin-top: 25px; padding-top: 12px; border-top: 1px solid #d0d0d0; text-align: center; color: #666; font-size: 10px; }' +
+                '.footer p { font-size: 10px; }' +
+                '@media print { body { margin: 0; padding: 12px; font-size: 11px; } .no-print { display: none; } }' +
+                '</style></head><body>' +
+                '<div class="pdf-header">' +
+                '<img src="' + logoPath + '" alt="Lindsay Precast">' +
+                '<div class="pdf-header-text">' +
+                '<h1>Foam Sheet Tracker Report</h1>' +
+                '<p>Generated: ' + new Date().toLocaleString() + '</p>' +
+                '</div>' +
+                '</div>' +
+                customerInfo +
+                '<h2>Summary</h2><div class="summary-box">' +
+                '<div class="summary-row"><span>Sheet Size:</span><span><strong>' + state.sheetSize.width + "' × " + state.sheetSize.height + "' (" + totals.sheetAreaSqFt + ' sq ft)</strong></span></div>' +
+                '<div class="summary-row"><span>Total Hole Area:</span><span><strong>' + totals.totalHoleArea.toFixed(2) + ' sq ft</strong></span></div>' +
+                '<div class="summary-row"><span>Waste Factor (10%):</span><span><strong>' + totals.wasteArea.toFixed(2) + ' sq ft</strong></span></div>' +
+                '<div class="summary-row"><span>Total Area Needed:</span><span><strong>' + totals.totalAreaNeeded.toFixed(2) + ' sq ft</strong></span></div>' +
+                '<div class="summary-row highlight"><span>SHEETS REQUIRED:</span><span>' + totals.sheetsRequired + '</span></div>' +
+                '</div>' +
+                '<h2>Breakdown by Thickness</h2><table><thead><tr><th>Thickness</th><th class="text-right">Area (sq ft)</th><th class="text-right">Sheets</th></tr></thead><tbody>' +
+                breakdownRows +
+                '</tbody></table>' +
+                '<h2>Hole Details</h2><table><thead><tr><th>Type</th><th>Diameter</th><th>Thickness</th><th class="text-right">Quantity</th><th class="text-right">Area per Hole</th><th class="text-right">Total Area</th></tr></thead><tbody>' +
+                holeRows +
+                '</tbody></table>' +
+                '<div class="footer"><p>Foam Sheet Tracker - Lindsay Precast</p></div>' +
+                '<div class="no-print" style="margin-top: 30px; text-align: center;">' +
+                '<button onclick="window.print()" style="padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 10px;">Print / Save as PDF</button>' +
+                '<button onclick="window.close()" style="padding: 12px 24px; background: #6b7280; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">Close</button>' +
+                '</div></body></html>';
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+        });
+
+        // Save project function
+        document.querySelectorAll('.footer-actions .btn-secondary')[1].addEventListener('click', function() {
+            const saveData = {
+                customerName: state.customerName,
+                jobNumber: state.jobNumber,
+                jobName: state.jobName,
+                holes: state.holes
+            };
+            localStorage.setItem('foamTrackerData', JSON.stringify(saveData));
+            showToast('Project saved successfully!', 'success');
+        });
+
+        // Initialize everything when DOM is ready
+        window.addEventListener('DOMContentLoaded', function() {
+            // Initialize DOM Elements
+            elements = {
+                customerName: document.querySelector('#customer-name'),
+                jobNumber: document.querySelector('#job-number'),
+                jobName: document.querySelector('#job-name'),
+                holeType: document.querySelector('#hole-type-select'),
+                holeDiameter: document.querySelector('#hole-diameter'),
+                holeWidth: document.querySelector('#hole-width'),
+                holeHeight: document.querySelector('#hole-height'),
+                roundDiameterGroup: document.querySelector('#round-diameter-group'),
+                skewedDimensionsGroup: document.querySelector('#skewed-dimensions-group'),
+                foamThickness: document.querySelectorAll('select')[1],
+                addButton: document.querySelector('.btn-primary'),
+                clearButton: document.querySelector('.btn-secondary'),
+                holesList: document.querySelector('.holes-list'),
+                resetButton: document.querySelectorAll('.btn-secondary.btn-large')[0]
+            };
+
+            // Update state when customer/job info changes
+            elements.customerName.addEventListener('input', function() {
+                state.customerName = this.value;
+            });
+            elements.jobNumber.addEventListener('input', function() {
+                state.jobNumber = this.value;
+            });
+            elements.jobName.addEventListener('input', function() {
+                state.jobName = this.value;
+            });
+
+            // Toggle between diameter and width/height based on hole type
+            elements.holeType.addEventListener('change', function() {
+                if (this.value === 'round') {
+                    elements.roundDiameterGroup.style.display = 'block';
+                    elements.skewedDimensionsGroup.style.display = 'none';
+                } else {
+                    elements.roundDiameterGroup.style.display = 'none';
+                    elements.skewedDimensionsGroup.style.display = 'flex';
+                }
+            });
+
+            // Setup Event Listeners
+            elements.addButton.addEventListener('click', addHole);
+            elements.clearButton.addEventListener('click', clearForm);
+            elements.resetButton.addEventListener('click', resetAll);
+
+            // Allow Enter key to add hole
+            elements.holeDiameter.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addHole();
+                }
+            });
+
+            // Load saved data
+            const savedData = localStorage.getItem('foamTrackerData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    // Support old format (just holes array) and new format (object with customer info)
+                    if (Array.isArray(data)) {
+                        // Old format - just holes
+                        data.forEach(h => {
+                            const hole = new Hole(h.type, h.diameter, h.thickness, h.quantity, h.width, h.height);
+                            hole.id = h.id;
+                            state.holes.push(hole);
+                            if (h.id >= state.nextId) {
+                                state.nextId = h.id + 1;
+                            }
+                        });
+                    } else {
+                        // New format - object with customer info and holes
+                        state.customerName = data.customerName || '';
+                        state.jobNumber = data.jobNumber || '';
+                        state.jobName = data.jobName || '';
+                        elements.customerName.value = state.customerName;
+                        elements.jobNumber.value = state.jobNumber;
+                        elements.jobName.value = state.jobName;
+                        if (data.holes) {
+                            data.holes.forEach(h => {
+                                const hole = new Hole(h.type, h.diameter, h.thickness, h.quantity, h.width, h.height);
+                                hole.id = h.id;
+                                state.holes.push(hole);
+                                if (h.id >= state.nextId) {
+                                    state.nextId = h.id + 1;
+                                }
+                            });
+                        }
+                    }
+                    render();
+                } catch (e) {
+                    console.error('Error loading saved data:', e);
+                }
+            } else {
+                // Initialize with empty state
+                render();
+            }
+        });
+    </script>
+</body>
+</html>
